@@ -35,7 +35,7 @@ def get_Search_result(question:str):
 
 
 
-st.title("Streaming Chat Response App")
+st.title("Search On Steroids")
 
 user_question = st.text_input("Enter your question:")
 
