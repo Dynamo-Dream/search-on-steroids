@@ -46,7 +46,7 @@ if user_question:
     with st.spinner("Fetching answer..."):
         try:
             result = top5_results(user_question)
-            for chunk in llm.stream(f"{result}\n\n---\n\n COntext is Provided Above. Answer the below quesion at best of your ability and attach any inline citation link if availaible:\n\n {user_question}"):
+            for chunk in llm.stream(f"{result}\n\n---\n\n COntext is Provided Above. Answer the below quesion at best of your ability and attach any inline citation if availaible:\n\n {user_question}"):
                 chunk_content = chunk.content
                 full_response += chunk_content
                 response_area.markdown(full_response)
