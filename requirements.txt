@@ -1,0 +1,6 @@
+langchain==0.3.3
+langchain-core==0.3.10
+langchain-google-vertexai
+langchain-community
+google-auth
+python-dotenv==1.0.1
