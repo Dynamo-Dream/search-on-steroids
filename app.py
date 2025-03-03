@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.tools import Tool
 from langchain_google_vertexai import ChatVertexAI
-from youtube_transcript_api import YouTubeTranscriptApi
+from mongo_client import get_thread_source_transcription_in_json
 
 load_dotenv()
 
@@ -61,8 +61,8 @@ llm = ChatVertexAI(
 
 
 def ai_notes(video_id):
-    transcript = YouTubeTranscriptApi.get_transcript(video_id)
-    data = "\n".join([f"{data['start']} {data['text']}" for data in transcript])
+    transcript = get_thread_source_transcription_in_json(video_id)
+    data = "\n".join([f"{data['offset']} {data['text']}" for data in transcript])
     final_prompt = IS_PODCAST + f"\n---\nTRANSCRIPT DATA:\n{data}"
     response = llm.invoke(final_prompt)
     if response == "Yes":
