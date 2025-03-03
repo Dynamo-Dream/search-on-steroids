@@ -5,3 +5,4 @@ langchain-community
 google-auth
 python-dotenv==1.0.1
 langchain-google-community
+youtube-transcript-api
