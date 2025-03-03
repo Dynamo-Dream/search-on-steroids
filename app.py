@@ -95,7 +95,7 @@ def main():
             # Iterate over the streamed tokens and update the placeholder in real time
             for token in ai_notes(video_id):
                 output_text += token
-                output_placeholder.text(output_text)
+                output_placeholder.markdown(output_text)
 
 
 if __name__ == "__main__":
