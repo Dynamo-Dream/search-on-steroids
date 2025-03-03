@@ -18,13 +18,39 @@ def base64ToString(b):
 
 
 AI_NOTES_EDU_PROMPT = """
-You are a students who is very good at taking concise, pointwise notes for readers from the transcript of the video for the exams of student
-The notes that you take only contains important key definations,concepts, example, formulaes, Tables, mnemonics etc which can directly be used before exams. 
-You want to create that is easier to revise whenever needed.
-The timestamp in millisecond is also attached in the trasncript, enclose the each millisecond timestamp inside double square brackets so that for readers it becomes easier to go to the video and understand the concept. Example:=>[[234]] OR [[234]]-[[2045]]
-and always end your notes with small Q&A.
-Start Your Notes With "Notes is provided below".
-refrain from mentioning Ads, sponsers and all in the notes. We only need important information
+Task:
+Create structured notes from the provided video transcript while maintaining the flow of the video according to the provided chapters.
+If the chapters are not provided you can create chapters and follow the below requirements.
+
+Requirements:
+
+- Use Subheadings, and Bullet Points to maintain clarity and readability.
+- Ensure the structure follows the sequence of topics as they appear in the video.
+- Add millisecond timestamps adjacent to Sub headings only, enclosed in double square brackets (e.g., [[234]] or [[234]]-[[2045]]). 
+    Keep Timestamp with Sub headings only, we do not want to clutter the notes with too many timestamps.
+- Bold key terms, italicize explanations. Use tables at least once in the notes for clarity.
+- Summarize key points, avoid unnecessary details which is not related to learning. Include formulas, real-world examples, or analogies where needed.
+
+Ignore notes on Things like Introduction, sponsers, ads or summary. We need only learning activity in the notes.
+No need to provide summary ot key points at the end of Notes.
+"""
+
+AI_NOTES_EDU_PROMPT2 = """
+Task:
+Create structured notes from the provided video transcript while maintaining the logical flow of the video.
+
+Requirements:
+
+- Use Subheadings, and Bullet Points to maintain clarity and readability.
+- Ensure the structure follows the sequence of topics as they appear in the video.
+- Add millisecond timestamps adjacent to Sub headings only, enclosed in double square brackets (e.g., [[234]] or [[234]]-[[2045]]). 
+    Keep Timestamp with Sub headings only, we do not want to clutter the notes with too many timestamps.
+- Bold key terms, italicize explanations. 
+- Use tables at least once in the notes for clarity.
+- Summarize key points, avoid unnecessary details which is not related to learning. Include formulas, real-world examples, or analogies where needed.
+
+Ignore notes on Things like Introduction, sponsers, ads or summary. 
+We need only learning activity in the notes. No need to provide summary ot key points at the end of Notes.
 """
 
 AI_NOTES_POD_PROMPT = """
@@ -60,31 +86,56 @@ llm = ChatVertexAI(
 )
 
 
-def ai_notes(video_id):
-    transcript = get_thread_source_transcription_in_json(video_id)
+def ai_notes(video_id, prompt_id):
+    transcript, chapters = get_thread_source_transcription_in_json(video_id)
     data = "\n".join([f"{data['offset']} {data['text']}" for data in transcript])
     final_prompt = IS_PODCAST + f"\n---\nTRANSCRIPT DATA:\n{data}"
     response = llm.invoke(final_prompt)
+    prompt = None
     if response == "Yes":
         prompt = AI_NOTES_POD_PROMPT
+        prompt = ChatPromptTemplate.from_messages(
+            [("system", prompt), ("user", "## INPUT:\n{input}\n")]
+        )
+        chain = prompt | llm
+
+        content = ""
+        for data in chain.stream({"input": data}):
+            content += data.content + " "
+            yield f"{data.content}"
     else:
-        prompt = AI_NOTES_EDU_PROMPT
+        if prompt_id == 1:
+            prompt = AI_NOTES_EDU_PROMPT
+            prompt = ChatPromptTemplate.from_messages(
+                [
+                    ("system", prompt),
+                    ("user", "## INPUT:\n{input}\n---\nCHAPTERS:\n{chapter}"),
+                ]
+            )
+            chain = prompt | llm
 
-    prompt = ChatPromptTemplate.from_messages(
-        [("system", prompt), ("user", "## INPUT:\n{input}")]
-    )
-    chain = prompt | llm
+            content = ""
+            for data in chain.stream({"input": data, "chapter": chapters}):
+                content += data.content + " "
+                yield f"{data.content}"
 
-    content = ""
-    for data in chain.stream({"input": data}):
-        content += data.content + " "
-        yield f"{data.content}"
+        else:
+            prompt = AI_NOTES_EDU_PROMPT2
+            prompt = ChatPromptTemplate.from_messages(
+                [("system", prompt), ("user", "## INPUT:\n{input}\n")]
+            )
+            chain = prompt | llm
+
+            content = ""
+            for data in chain.stream({"input": data}):
+                content += data.content + " "
+                yield f"{data.content}"
 
 
 def main():
     st.title("AI Notes for YouTube Video")
     video_id = st.text_input("Enter YouTube Video ID:")
-
+    prompt_id = st.text_input("Enter Prompt ID:")
     if st.button("Generate Notes"):
         if not video_id.strip():
             st.error("Please enter a valid YouTube video ID.")
@@ -93,7 +144,7 @@ def main():
             output_placeholder = st.empty()
             output_text = ""
             # Iterate over the streamed tokens and update the placeholder in real time
-            for token in ai_notes(video_id):
+            for token in ai_notes(video_id, prompt_id):
                 output_text += token
                 output_placeholder.markdown(output_text)
 

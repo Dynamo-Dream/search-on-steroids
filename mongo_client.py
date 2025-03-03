@@ -37,9 +37,12 @@ def get_thread_source_transcription_in_json(video_id: str):
         json_data = thread_source_doc["youtube_metadata"]["transcriptions"][0][
             "transcription"
         ]
+        chapters = thread_source_doc["youtube_metadata"]["chapters"]
+        if chapters:
+            chapters = [chapter["title"] for chapter in chapters]
         for dictionary in json_data:
             del dictionary["_id"]
-        return json_data
+        return json_data, chapters
 
     except Exception as e:
         print(e)
