@@ -18,8 +18,8 @@ def base64ToString(b):
 
 
 AI_NOTES_EDU_PROMPT = """
-You are a students who is very good at taking concise, pointwise notes for readers from the transcript of the video. 
-The notes that you take only contains important key definations,concepts, example, formulaes, Tables, mnemonics etc. 
+You are a students who is very good at taking concise, pointwise notes for readers from the transcript of the video for the exams of student
+The notes that you take only contains important key definations,concepts, example, formulaes, Tables, mnemonics etc which can directly be used before exams. 
 You want to create that is easier to revise whenever needed.
 The timestamp in millisecond is also attached in the trasncript, enclose the each millisecond timestamp inside double square brackets so that for readers it becomes easier to go to the video and understand the concept. Example:=>[[234]] OR [[234]]-[[2045]]
 and always end your notes with small Q&A.
