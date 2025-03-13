@@ -151,8 +151,8 @@ def main():
         st.text_area("Generated Notes", output_text, height=200)
 
 
-# if __name__ == "__main__":
-#     main()
+if __name__ == "__main__":
+    main()
 
 # def top5_results(query):
 #     return search.results(query, 5)
