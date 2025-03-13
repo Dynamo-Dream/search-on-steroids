@@ -30,7 +30,7 @@ Requirements:
     Keep Timestamp with Sub headings only, we do not want to clutter the notes with too many timestamps.
 - Bold key terms, italicize explanations. Use tables at least once in the notes for clarity.
 - Summarize key points, avoid unnecessary details which is not related to learning. Include formulas, real-world examples, or analogies where needed.
-
+- The Fomulaes in the Notes must me in LaTeX
 Ignore notes on Things like Introduction, sponsers, ads or summary. We need only learning activity in the notes.
 No need to provide summary ot key points at the end of Notes.
 """
@@ -48,7 +48,7 @@ Requirements:
 - Bold key terms, italicize explanations. 
 - Use tables at least once in the notes for clarity.
 - Summarize key points, avoid unnecessary details which is not related to learning. Include formulas, real-world examples, or analogies where needed.
-
+- The Fomulaes in the Notes must me in LaTeX
 Ignore notes on Things like Introduction, sponsers, ads or summary. 
 We need only learning activity in the notes. No need to provide summary ot key points at the end of Notes.
 """
@@ -148,9 +148,11 @@ def main():
                 output_text += token
                 output_placeholder.markdown(output_text)
 
+        st.text_area("Generated Notes", output_text, height=200)
 
-if __name__ == "__main__":
-    main()
+
+# if __name__ == "__main__":
+#     main()
 
 # def top5_results(query):
 #     return search.results(query, 5)
